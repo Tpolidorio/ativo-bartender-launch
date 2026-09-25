@@ -1,4 +1,4 @@
 - [x] Criar página premium responsiva com seções, navegação e imagens demonstrativas.
 - [x] Criar armazenamento privado para pedidos de orçamento.
 - [x] Conectar formulário, interações e contatos configuráveis.
-- [ ] Conferir experiência em desktop/mobile e funcionamento do formulário.
+- [x] Conferir experiência em desktop/mobile e funcionamento do formulário.
