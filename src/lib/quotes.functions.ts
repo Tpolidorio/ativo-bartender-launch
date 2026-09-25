@@ -6,7 +6,7 @@ export const quoteSchema = z.object({
   telefone: z.string().trim().regex(/^[+()\d\s.-]{8,30}$/, "Informe um WhatsApp válido."),
   email: z.string().trim().email("Informe um e-mail válido.").max(255),
   tipo_evento: z.enum(["Casamento", "Aniversário", "Formatura", "Corporativo", "Debutante", "Confraternização", "Festa particular", "Outro"]),
-  data_evento: z.string().optional(),
+  data_evento: z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Informe uma data válida.")]).optional(),
   cidade: z.string().trim().min(2, "Informe a cidade do evento.").max(120),
   quantidade_convidados: z.number().int().positive().max(100000).optional(),
   tipo_servico: z.string().trim().min(1, "Selecione o serviço desejado.").max(100),
@@ -24,6 +24,7 @@ export const submitQuote = createServerFn({ method: "POST" })
       ...fields,
       data_evento: fields.data_evento || null,
       quantidade_convidados: fields.quantidade_convidados ?? null,
+      observacoes: fields.observacoes ?? null,
     });
     if (error) throw new Error("Não foi possível enviar seu pedido. Tente novamente.");
     return { success: true };
