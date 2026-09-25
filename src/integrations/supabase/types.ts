@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orcamentos: {
+        Row: {
+          cidade: string
+          created_at: string
+          data_evento: string | null
+          email: string
+          id: string
+          nome: string
+          observacoes: string | null
+          quantidade_convidados: number | null
+          status: string
+          telefone: string
+          tipo_evento: string
+          tipo_servico: string
+          updated_at: string
+        }
+        Insert: {
+          cidade: string
+          created_at?: string
+          data_evento?: string | null
+          email: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          quantidade_convidados?: number | null
+          status?: string
+          telefone: string
+          tipo_evento: string
+          tipo_servico: string
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string
+          created_at?: string
+          data_evento?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          quantidade_convidados?: number | null
+          status?: string
+          telefone?: string
+          tipo_evento?: string
+          tipo_servico?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
