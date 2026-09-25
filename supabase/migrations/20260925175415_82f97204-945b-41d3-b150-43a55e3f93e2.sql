@@ -1,0 +1,1 @@
+CREATE POLICY "Apenas servico privado acessa orcamentos" ON public.orcamentos FOR ALL TO service_role USING (true) WITH CHECK (true);
