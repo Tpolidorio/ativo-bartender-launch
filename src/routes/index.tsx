@@ -1,24 +1,124 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, ChevronDown, GlassWater, Instagram, Mail, MapPin, Menu, MessageCircle, ShieldCheck, Sparkles, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { quoteSchema, submitQuote } from "@/lib/quotes.functions";
+import { siteConfig, whatsappUrl } from "@/lib/site-config";
+import hero from "@/assets/hero-bartender.jpg";
+import story from "@/assets/story-bartender.jpg";
+import drinks from "@/assets/drinks.jpg";
+import event from "@/assets/event-toast.jpg";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const description = "Transforme seu evento com a Ativo Bartender. Serviço profissional de bartender, drinks e experiência de bar para casamentos, aniversários, festas e eventos corporativos.";
 export const Route = createFileRoute("/")({
+  head: () => ({ meta: [
+    { title: "Ativo Bartender | Bartender e Bar para Eventos" },
+    { name: "description", content: description },
+    { property: "og:title", content: "Ativo Bartender | Bartender e Bar para Eventos" },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: "/" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ], links: [{ rel: "canonical", href: "/" }] }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+const nav = [["Início", "inicio"], ["Serviços", "servicos"], ["Experiências", "experiencia"], ["Galeria", "galeria"], ["Sobre", "sobre"], ["Depoimentos", "depoimentos"], ["FAQ", "faq"], ["Contato", "contato"]];
+const services = [
+  ["01", "Bartender para Eventos", "Profissionais preparados para oferecer um atendimento elegante, ágil e descontraído aos seus convidados.", "Quero saber mais"],
+  ["02", "Bar Completo", "Uma experiência completa de bar para seu evento, com estrutura organizada, bartender e preparação dos drinks.", "Solicitar orçamento"],
+  ["03", "Cardápio Personalizado", "Uma seleção de drinks criada de acordo com o estilo da festa e o perfil dos seus convidados.", "Criar meu cardápio"],
+  ["04", "Drinks Clássicos e Autorais", "Cocktails conhecidos e criações especiais para surpreender os convidados em cada brinde.", "Conhecer opções"],
+  ["05", "Eventos Corporativos", "Serviço de bartender para empresas, confraternizações, lançamentos e eventos especiais.", "Orçamento corporativo"],
+  ["06", "Festas e Celebrações", "Para aniversários, casamentos, formaturas, debutantes e comemorações memoráveis.", "Planejar meu evento"],
+];
+const eventTypes = ["Casamentos", "Aniversários", "Formaturas", "Eventos corporativos", "Debutantes", "Confraternizações", "Festas particulares", "Eventos especiais"];
+const steps = [
+  ["01", "Entendemos seu evento", "Conhecemos o estilo da festa, a quantidade de convidados e suas preferências."],
+  ["02", "Planejamos a experiência", "Definimos o formato de atendimento e as melhores opções para seu evento."],
+  ["03", "Montamos tudo", "Organizamos o serviço para que você possa aproveitar sua festa."],
+  ["04", "Seus convidados aproveitam", "Drinks preparados na hora, atendimento profissional e uma experiência memorável."],
+];
+const faqs = [
+  ["A Ativo Bartender atende quais tipos de eventos?", "Atendemos casamentos, aniversários, formaturas, festas particulares, debutantes e eventos corporativos. Conte sobre a sua ocasião para planejarmos juntos."],
+  ["Vocês levam toda a estrutura do bar?", "O formato do serviço e a estrutura necessária são definidos conforme o espaço e as necessidades do seu evento. Consulte as opções disponíveis no orçamento."],
+  ["É possível personalizar os drinks?", "Sim. Podemos conversar sobre suas preferências e o estilo da comemoração para criar uma seleção de drinks especial."],
+  ["Vocês atendem eventos corporativos?", "Sim. Planejamos experiências de bar para confraternizações, lançamentos, ativações e outras ocasiões empresariais."],
+  ["Com quanto tempo devo solicitar o orçamento?", "Entre em contato assim que souber a data do evento. Assim podemos conversar sobre disponibilidade e detalhes do serviço."],
+  ["Vocês atendem outras cidades?", "Informe a cidade do evento no pedido de orçamento para confirmarmos a disponibilidade de atendimento."],
+  ["Como funciona a contratação?", "Você nos conta os detalhes do evento, conversamos sobre as possibilidades e preparamos uma proposta personalizada."],
+];
+const gallery = [
+  { src: story, alt: "Bartender finalizando um cocktail em um evento elegante", className: "gallery-tall" },
+  { src: drinks, alt: "Seleção de cocktails coloridos preparados para celebração", className: "" },
+  { src: event, alt: "Convidados brindando em uma celebração com bar", className: "" },
+  { src: hero, alt: "Bartender preparando drink em bar de evento", className: "gallery-wide" },
+];
+
+function Brand() { return <a href="#inicio" className="brand" aria-label="Ativo Bartender, voltar ao início"><span className="brand-mark">A<span>✳</span></span><span className="brand-text">ATIVO <strong>BARTENDER</strong><small>BAR • EVENTOS • EXPERIÊNCIAS</small></span></a>; }
+function WhatsAppLink({ children, className = "", icon = false }: { children: React.ReactNode; className?: string; icon?: boolean }) { return <a href={whatsappUrl} target={siteConfig.whatsappNumber ? "_blank" : undefined} rel={siteConfig.whatsappNumber ? "noopener noreferrer" : undefined} className={className}>{icon && <MessageCircle size={18} />}{children}</a>; }
+function SectionTitle({ eyebrow, title, text, centered = false }: { eyebrow: string; title: string; text?: string; centered?: boolean }) { return <div className={`section-title ${centered ? "centered" : ""}`}><span className="eyebrow"><span className="eyebrow-line" />{eyebrow}</span><h2>{title}</h2>{text && <p>{text}</p>}</div>; }
+
 function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const [testimonial, setTestimonial] = useState(0);
+  const [sending, setSending] = useState(false);
+  const [formStatus, setFormStatus] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 30); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll); }, []);
+  useEffect(() => { if (lightbox === null) return; const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightbox(null); if (e.key === "ArrowRight") setLightbox((v) => v === null ? 0 : (v + 1) % gallery.length); if (e.key === "ArrowLeft") setLightbox((v) => v === null ? 0 : (v + gallery.length - 1) % gallery.length); }; window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey); }, [lightbox]);
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); setFormStatus("");
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const parsed = quoteSchema.safeParse({
+      nome: data.get("nome"), telefone: data.get("telefone"), email: data.get("email"), tipo_evento: data.get("tipo_evento"),
+      data_evento: String(data.get("data_evento") || ""), cidade: data.get("cidade"),
+      quantidade_convidados: data.get("quantidade_convidados") ? Number(data.get("quantidade_convidados")) : undefined,
+      tipo_servico: data.get("tipo_servico"), observacoes: data.get("observacoes"), website: data.get("website"),
+    });
+    if (!parsed.success) { setErrors(Object.fromEntries(parsed.error.issues.map(issue => [String(issue.path[0]), issue.message]))); setFormStatus("Confira os campos indicados e tente novamente."); return; }
+    setErrors({}); setSending(true);
+    try { await submitQuote({ data: parsed.data }); setFormStatus("Pedido enviado com sucesso! Entraremos em contato em breve."); form.reset(); }
+    catch { setFormStatus("Não foi possível enviar seu pedido agora. Tente novamente."); }
+    finally { setSending(false); }
+  }
+  return <div className="site-shell">
+    <header className={`site-header ${scrolled || menuOpen ? "is-scrolled" : ""}`}><div className="header-inner"><Brand /><nav className="desktop-nav" aria-label="Menu principal">{nav.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</nav><a href="#contato" className="header-cta">Solicitar orçamento <ArrowUpRight size={15} /></a><Button variant="ghost" size="icon" className="mobile-menu-button" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button></div>{menuOpen && <nav className="mobile-nav" aria-label="Menu móvel">{nav.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)}>{label}<ArrowUpRight size={15} /></a>)}<a href="#contato" onClick={() => setMenuOpen(false)}>Solicitar orçamento <ArrowUpRight size={15} /></a></nav>}</header>
+
+    <main>
+      <section id="inicio" className="hero"><img src={hero} width={1600} height={1008} alt="Bartender preparando um cocktail em evento elegante" className="hero-image" /><div className="hero-shade" /><div className="container hero-content"><div className="hero-copy"><div className="hero-kicker"><span className="kicker-line" /> O BAR QUE TRANSFORMA O SEU EVENTO</div><h1>Transformamos seu evento em uma experiência <em>inesquecível.</em></h1><p className="hero-lead">Drinks incríveis, atendimento profissional e uma experiência de bar que seus convidados vão lembrar.</p><p className="hero-sub">A Ativo Bartender leva até seu evento uma experiência completa de bar, combinando cocktails, apresentação, atendimento e qualidade para tornar cada celebração ainda mais especial.</p><div className="hero-actions"><WhatsAppLink icon className="btn btn-primary">{siteConfig.whatsappNumber ? "Solicitar orçamento pelo WhatsApp" : "Solicitar orçamento"}<ArrowUpRight size={17} /></WhatsAppLink><a className="btn btn-outline" href="#servicos">Conhecer nossos serviços <ArrowRight size={17} /></a></div><div className="hero-trust"><span><Check /> Atendimento personalizado</span><span><Check /> Bartenders profissionais</span><span><Check /> Drinks preparados na hora</span><span><Check /> Para diferentes eventos</span></div></div></div><a className="scroll-hint" href="#diferenciais"><span>ROLE PARA CONHECER</span><ArrowDown size={16} /></a><div className="hero-side-note">ATIVO BARTENDER <span>—</span> EXPERIÊNCIAS QUE BRINDAM A VIDA</div></section>
+
+      <section id="diferenciais" className="trust-band"><div className="container trust-grid">{[[Sparkles, "Experiência", "Muito mais do que servir bebidas."], [ShieldCheck, "Profissionalismo", "Atendimento do início ao fim."], [GlassWater, "Qualidade", "Drinks preparados com cuidado."], [Check, "Personalização", "O seu evento, do seu jeito."]].map(([Icon, title, text]) => { const I = Icon as typeof Sparkles; return <div className="trust-item" key={title as string}><I size={25} strokeWidth={1.3} /><div><strong>{title as string}</strong><p>{text as string}</p></div></div>; })}</div></section>
+
+      <section className="section story-section"><div className="container story-grid"><div className="story-image-wrap"><img src={story} width={912} height={1152} loading="lazy" alt="Bartender preparando um drink em uma festa sofisticada" /><span className="image-caption">A EXPERIÊNCIA COMEÇA NOS DETALHES <ArrowUpRight size={15} /></span></div><div className="story-copy"><SectionTitle eyebrow="ALÉM DO BRINDE" title="Seu evento merece mais do que simplesmente servir bebidas." /><p>Na Ativo Bartender, cada detalhe é pensado para transformar o bar em uma verdadeira atração da festa.</p><p>Da apresentação dos drinks ao atendimento dos convidados, criamos uma experiência que combina sabor, diversão e sofisticação.</p><div className="benefit-list">{["Drinks preparados na hora", "Atendimento elegante e profissional", "Cardápios personalizados", "Experiência adaptada ao seu evento", "Apresentação que valoriza sua celebração"].map(item => <div key={item}><span><Check size={16} /></span>{item}</div>)}</div><a href="#contato" className="text-link">Vamos conversar sobre seu evento <ArrowUpRight size={18} /></a></div></div></section>
+
+      <section id="servicos" className="section services-section"><div className="container"><div className="section-heading-row"><SectionTitle eyebrow="O QUE FAZEMOS" title="Uma experiência de bar pensada para o seu evento" text="Escolha o formato ideal para transformar sua comemoração." /><span className="section-aside">SERVIÇOS / 01—06</span></div><div className="services-grid">{services.map(([number, title, text, action]) => <article className="service-card" key={number}><span className="service-number">{number} / SERVIÇO</span><GlassWater className="service-icon" size={35} strokeWidth={1.1} /><h3>{title}</h3><p>{text}</p><a href="#contato" aria-label={`${action}: ${title}`} className="service-link">{action}<ArrowUpRight size={18} /></a></article>)}</div></div></section>
+
+      <section className="section events-section"><div className="container"><SectionTitle eyebrow="CADA OCASIÃO É ÚNICA" title="Um bar que combina com qualquer celebração" text="Cada evento tem sua própria personalidade. Adaptamos nossa experiência ao estilo, número de convidados e proposta da sua comemoração." centered /><div className="event-pills">{eventTypes.map((type, i) => <a href="#contato" key={type}><span>{String(i + 1).padStart(2, "0")}</span>{type}<ArrowUpRight size={17} /></a>)}</div></div></section>
+
+      <section id="experiencia" className="section experience-section"><div className="container"><SectionTitle eyebrow="EXPERIÊNCIA ATIVO" title="Não servimos apenas drinks. Criamos momentos." text="Do primeiro contato ao último brinde, tudo é pensado para você aproveitar a ocasião." /><div className="steps-grid">{steps.map(([number, title, text]) => <div className="step" key={number}><span className="step-number">{number}</span><span className="step-dot" /><h3>{title}</h3><p>{text}</p></div>)}</div><a href="#contato" className="btn btn-primary experience-cta">Planejar minha experiência <ArrowUpRight size={17} /></a></div></section>
+
+      <section className="section drinks-section"><div className="container drinks-grid"><div className="drinks-copy"><SectionTitle eyebrow="SABOR EM CADA DETALHE" title="Drinks que chamam atenção antes mesmo do primeiro gole" text="Apresentação, sabor e criatividade trabalhando juntos." /><div className="drink-tags">{["Gin Tônica", "Mojito", "Caipirinha", "Aperol Spritz", "Moscow Mule", "Drinks autorais"].map(x => <span key={x}>{x}</span>)}</div><p className="drinks-note">O cardápio pode ser personalizado de acordo com o perfil e estilo de cada evento.</p><a href="#contato" className="text-link">Quero montar meu cardápio <ArrowUpRight size={18} /></a></div><div className="drinks-image"><img src={drinks} width={1200} height={800} loading="lazy" alt="Três cocktails coloridos com frutas e ervas" /><span>UMA EXPERIÊNCIA PARA TODOS OS SENTIDOS</span></div></div></section>
+
+      <section id="galeria" className="section gallery-section"><div className="container"><div className="section-heading-row"><SectionTitle eyebrow="MOMENTOS ATIVO" title="O melhor da festa acontece entre um brinde e outro." text="Uma pequena amostra do universo que inspira cada experiência." /><a href="#contato" className="text-link gallery-contact">Leve essa experiência para seu evento <ArrowUpRight size={18} /></a></div><div className="gallery-grid">{gallery.map((item, i) => <Button variant="ghost" className={`gallery-item ${item.className}`} key={item.alt} onClick={() => setLightbox(i)} aria-label={`Ampliar foto: ${item.alt}`}><img src={item.src} alt={item.alt} loading="lazy" /><span><ArrowUpRight size={20} /></span></Button>)}</div><p className="demo-note">Imagens ilustrativas. Fotos reais da Ativo Bartender poderão ser adicionadas em breve.</p></div></section>
+
+      <section id="sobre" className="section about-section"><div className="container about-grid"><div className="about-image"><img src={hero} width={1600} height={1008} loading="lazy" alt="Bartender em ação durante um evento" /></div><div className="about-copy"><SectionTitle eyebrow="QUEM SOMOS" title="Muito prazer, somos a Ativo Bartender" /><p>A Ativo Bartender nasceu com o propósito de levar mais experiência, sabor e personalidade para eventos especiais.</p><p>Nosso trabalho vai além de preparar drinks. Buscamos criar um ambiente descontraído, elegante e marcante, oferecendo aos anfitriões tranquilidade e aos convidados uma experiência que complementa cada celebração.</p><div className="about-words"><span>Atendimento personalizado</span><span>Profissionalismo</span><span>Qualidade</span><span>Experiência</span></div></div></div></section>
+
+      <section id="depoimentos" className="section testimonials-section"><div className="container testimonial-layout"><div><SectionTitle eyebrow="O QUE IMPORTA" title="Quem vive a experiência, recomenda" text="Este espaço está reservado para avaliações reais de quem celebrou com a Ativo Bartender." /></div><div className="testimonial-panel"><span className="sample-tag">ESPAÇO PARA DEPOIMENTOS REAIS</span><span className="quote-mark">“</span><p>{["Em breve, histórias de eventos e celebrações que ganharam um brinde especial.", "A experiência de cada cliente merece ser contada com autenticidade."][testimonial]}</p><div className="testimonial-bottom"><span>Depoimentos serão publicados após autorização dos clientes.</span><div><Button variant="ghost" size="icon" aria-label="Anterior" onClick={() => setTestimonial((testimonial + 1) % 2)}><ChevronLeft /></Button><Button variant="ghost" size="icon" aria-label="Próximo" onClick={() => setTestimonial((testimonial + 1) % 2)}><ChevronRight /></Button></div></div></div></div></section>
+
+      <section className="cta-section"><div className="container cta-inner"><span className="eyebrow">O PRÓXIMO BRINDE COMEÇA AQUI</span><h2>Seu evento merece um bar à altura do momento.</h2><p>Conte para a Ativo Bartender como será sua celebração e receba uma proposta personalizada.</p><WhatsAppLink icon className="btn btn-dark">Solicitar orçamento agora <ArrowUpRight size={18} /></WhatsAppLink></div></section>
+
+      <section id="contato" className="section contact-section"><div className="container contact-grid"><div className="contact-intro"><SectionTitle eyebrow="VAMOS CONVERSAR" title="Vamos preparar seu evento?" text="Preencha algumas informações e entraremos em contato para entender todos os detalhes." /><div className="contact-rule" /><p>Conte o que você está imaginando. O restante a gente constrói juntos, drink por drink.</p>{siteConfig.whatsappNumber && <WhatsAppLink icon className="text-link">Prefere falar pelo WhatsApp? <ArrowUpRight size={18} /></WhatsAppLink>}</div><form className="quote-form" onSubmit={handleSubmit} noValidate><div className="form-heading"><span>SEU EVENTO COMEÇA AQUI</span><span>01 / 01</span></div><div className="form-grid"><label>Nome *<input name="nome" autoComplete="name" placeholder="Seu nome" required aria-invalid={!!errors["nome"]} />{errors["nome"] && <small>{errors["nome"]}</small>}</label><label>WhatsApp *<input name="telefone" type="tel" autoComplete="tel" placeholder="(00) 00000-0000" required aria-invalid={!!errors["telefone"]} />{errors["telefone"] && <small>{errors["telefone"]}</small>}</label><label>E-mail *<input name="email" type="email" autoComplete="email" placeholder="seu@email.com" required aria-invalid={!!errors["email"]} />{errors["email"] && <small>{errors["email"]}</small>}</label><label>Tipo de evento *<select name="tipo_evento" defaultValue="" required aria-invalid={!!errors["tipo_evento"]}><option value="" disabled>Selecione uma opção</option>{["Casamento", "Aniversário", "Formatura", "Corporativo", "Debutante", "Confraternização", "Festa particular", "Outro"].map(x => <option key={x}>{x}</option>)}</select>{errors["tipo_evento"] && <small>Selecione o tipo de evento.</small>}</label><label>Data do evento<input name="data_evento" type="date" /></label><label>Cidade do evento *<input name="cidade" placeholder="Onde será o evento?" required aria-invalid={!!errors["cidade"]} />{errors["cidade"] && <small>{errors["cidade"]}</small>}</label><label>Convidados estimados<input name="quantidade_convidados" type="number" min="1" max="100000" placeholder="Ex.: 100" aria-invalid={!!errors["quantidade_convidados"]} />{errors["quantidade_convidados"] && <small>Informe um número válido.</small>}</label><label>Serviço desejado *<select name="tipo_servico" defaultValue="" required aria-invalid={!!errors["tipo_servico"]}><option value="" disabled>Selecione uma opção</option>{["Bartender para eventos", "Bar completo", "Cardápio personalizado", "Eventos corporativos", "Ainda não sei"].map(x => <option key={x}>{x}</option>)}</select>{errors["tipo_servico"] && <small>{errors["tipo_servico"]}</small>}</label><label className="full">Conte um pouco mais<textarea name="observacoes" rows={4} maxLength={2000} placeholder="Detalhes que você gostaria de compartilhar..." /></label></div><input name="website" className="honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" /><div className="form-footer"><p>Seus dados serão usados apenas para responder à sua solicitação.</p><Button type="submit" className="form-submit" disabled={sending}>{sending ? "Enviando..." : "Solicitar meu orçamento"}<ArrowUpRight size={17} /></Button></div>{formStatus && <p className={`form-status ${formStatus.includes("sucesso") ? "success" : "error"}`} role="status">{formStatus}</p>}</form></div></section>
+
+      <section id="faq" className="section faq-section"><div className="container faq-grid"><SectionTitle eyebrow="AINDA TEM DÚVIDAS?" title="Dúvidas frequentes" text="Tudo o que você precisa saber antes do primeiro brinde." /><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<ChevronDown size={19} /></summary><p>{answer}</p></details>)}</div></div></section>
+
+      <section className="instagram-section"><div className="container instagram-grid"><div><span className="eyebrow">ACOMPANHE NOSSOS MOMENTOS</span><h2>Acompanhe a <em>Ativo Bartender</em></h2><p>Veja nossos eventos, drinks e bastidores.</p>{siteConfig.instagramUrl && <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-link"><Instagram size={18} /> Seguir no Instagram <ArrowUpRight size={18} /></a>}</div><div className="instagram-images"><img src={drinks} width={1200} height={800} loading="lazy" alt="Cocktails coloridos em evento" /><img src={event} width={1200} height={912} loading="lazy" alt="Convidados brindando" /><img src={story} width={912} height={1152} loading="lazy" alt="Cocktail preparado pelo bartender" /></div></div></section>
+    </main>
+    <footer className="footer"><div className="container"><div className="footer-main"><div className="footer-brand"><Brand /><p>Experiência de bar para eventos inesquecíveis.</p></div><div className="footer-links"><strong>EXPLORE</strong>{[["Início", "inicio"], ["Serviços", "servicos"], ["Galeria", "galeria"], ["Sobre", "sobre"], ["FAQ", "faq"], ["Contato", "contato"]].map(([label, id]) => <a href={`#${id}`} key={id}>{label}</a>)}</div><div className="footer-contact"><strong>CONTATO</strong>{siteConfig.whatsappNumber && <WhatsAppLink><MessageCircle size={16} /> WhatsApp</WhatsAppLink>}{siteConfig.instagramUrl && <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer"><Instagram size={16} /> Instagram</a>}{siteConfig.email && <a href={`mailto:${siteConfig.email}`}><Mail size={16} /> {siteConfig.email}</a>}{siteConfig.serviceArea && <span><MapPin size={16} /> {siteConfig.serviceArea}</span>}<a href="#contato">Solicitar orçamento <ArrowUpRight size={16} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Ativo Bartender. Todos os direitos reservados.</span><span>FEITO PARA CELEBRAR</span></div></div></footer>
+    {siteConfig.whatsappNumber && <><WhatsAppLink className="floating-whatsapp" icon><span className="sr-only">Pedir orçamento pelo WhatsApp</span></WhatsAppLink><div className="mobile-bottom"><WhatsAppLink icon className="btn btn-primary">Pedir orçamento pelo WhatsApp <ArrowUpRight size={17} /></WhatsAppLink></div></>}
+    {lightbox !== null && gallery[lightbox] && <div className="lightbox" role="dialog" aria-modal="true" aria-label="Foto ampliada" onClick={() => setLightbox(null)}><Button variant="ghost" size="icon" className="lightbox-close" aria-label="Fechar foto" onClick={() => setLightbox(null)}><X /></Button><Button variant="ghost" size="icon" className="lightbox-prev" aria-label="Foto anterior" onClick={e => { e.stopPropagation(); setLightbox((lightbox + gallery.length - 1) % gallery.length); }}><ChevronLeft /></Button><img src={gallery[lightbox].src} alt={gallery[lightbox].alt} onClick={e => e.stopPropagation()} /><Button variant="ghost" size="icon" className="lightbox-next" aria-label="Próxima foto" onClick={e => { e.stopPropagation(); setLightbox((lightbox + 1) % gallery.length); }}><ChevronRight /></Button></div>}
+  </div>;
 }
