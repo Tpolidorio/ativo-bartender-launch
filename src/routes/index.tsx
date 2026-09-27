@@ -66,7 +66,6 @@ const gallery = [
   { src: fruit, alt: "Frutas e ingredientes frescos no bar de evento", className: "", video: undefined },
   { src: guest, alt: "Convidada experimentando um drink no evento", className: "", video: undefined },
   { src: team, alt: "Equipe da Ativo Bartender atendendo um evento", className: "gallery-wide", video: undefined },
-  { src: setup, alt: "Bar montado com bebidas e ingredientes para o evento", className: "", video: undefined },
   { src: guestTwo, alt: "Convidado com um drink preparado no evento", className: "", video: undefined },
   { src: posterDrinkAsset.url, alt: "Vídeo da preparação de um drink pela equipe", className: "gallery-video", video: videoDrinkAsset.url },
   { src: posterBarAsset.url, alt: "Vídeo do bar da Ativo Bartender em evento", className: "gallery-video", video: videoBarAsset.url },
