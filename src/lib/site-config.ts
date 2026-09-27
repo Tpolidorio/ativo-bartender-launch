@@ -1,7 +1,8 @@
-/** Replace these details when the business shares its official contact channels. */
+/** Official contact channels; leave unknown details unset rather than inventing them. */
 export const siteConfig = {
-  whatsappNumber: "",
-  instagramUrl: "",
+  whatsappNumber: "5511944966280",
+  instagramUrl: "https://www.instagram.com/ativobartender/",
+  threadsUrl: "https://www.threads.com/@ativobartender?xmt=AQG0E9QEXkI69DReEdbRDgfRavChIslqzqfYXdaHWqxhxfs",
   email: "",
   serviceArea: "",
 };
