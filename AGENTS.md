@@ -12,3 +12,4 @@
 - Keep public marketing content in the single scrolling index route because this brief explicitly requests a landing page with section navigation.
 - Store contact destinations in `site-config.ts` so missing business details remain editable without invented links.
 - Submit public quotes through a validated server function and a private RLS-locked table; never expose quote rows in browser data access.
+- Store uploaded event photos and videos as Lovable Assets pointers, not repository binaries, to keep real media lightweight and replaceable.

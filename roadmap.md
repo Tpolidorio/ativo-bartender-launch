@@ -2,5 +2,5 @@
 - [x] Criar armazenamento privado para pedidos de orçamento.
 - [x] Conectar formulário, interações e contatos configuráveis.
 - [x] Conferir experiência em desktop/mobile e funcionamento do formulário.
-- [ ] Atualizar WhatsApp, Instagram e Threads com os contatos oficiais.
-- [ ] Substituir imagens demonstrativas por fotos reais enviadas e conferir a apresentação.
+- [x] Atualizar WhatsApp, Instagram e Threads com os contatos oficiais.
+- [x] Substituir imagens demonstrativas por fotos reais enviadas e conferir a apresentação.
