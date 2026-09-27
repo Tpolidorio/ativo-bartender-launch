@@ -7,7 +7,7 @@ export const siteConfig = {
   serviceArea: "",
 };
 
-export const whatsappMessage = "Olá, conheci a Ativo Bartender pelo site e gostaria de solicitar um orçamento para meu evento.";
+export const whatsappMessage = "Olá! Conheci a Ativo Bartender pelo site e gostaria de solicitar um orçamento de bartender para eventos. Podem me ajudar?";
 export const whatsappUrl = siteConfig.whatsappNumber
   ? `https://wa.me/${siteConfig.whatsappNumber.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappMessage)}`
   : "#contato";
