@@ -4,3 +4,5 @@
 - [x] Conferir experiência em desktop/mobile e funcionamento do formulário.
 - [x] Atualizar WhatsApp, Instagram e Threads com os contatos oficiais.
 - [x] Substituir imagens demonstrativas por fotos reais enviadas e conferir a apresentação.
+- [ ] Auditar visual e responsividade em desktop, tablet e celular; corrigir contrastes, alinhamentos e espaçamentos.
+- [ ] Testar e corrigir navegação, CTAs, formulário, galeria e rodapé para publicação.
