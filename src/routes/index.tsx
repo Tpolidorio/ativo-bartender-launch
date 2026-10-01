@@ -79,7 +79,6 @@ function Index() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [testimonial, setTestimonial] = useState(0);
   const [sending, setSending] = useState(false);
   const [formStatus, setFormStatus] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
