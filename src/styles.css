@@ -86,3 +86,68 @@
   .footer-main { gap: 32px; }
 }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .btn-primary::after { display: none; } }
+
+/* Publication pass: compact rhythm, stable layouts and visible keyboard states. */
+.section { padding-block: clamp(68px, 7vw, 98px); }
+.section-heading-row { margin-bottom: 36px; }
+.hero-sub, .section-title p, .hero-trust span { color: color-mix(in oklab, var(--foreground) 88%, transparent); }
+.hero-shade { background: linear-gradient(90deg, color-mix(in oklab, var(--background) 98%, transparent) 0%, color-mix(in oklab, var(--background) 88%, transparent) 45%, color-mix(in oklab, var(--background) 30%, transparent) 100%), linear-gradient(0deg, var(--background) 0%, transparent 28%); }
+.hero { min-height: 0; padding-block: 145px 92px; }
+.hero-copy { max-width: 730px; }
+.btn, .header-cta, .service-link, .event-pills a, .text-link, .footer a { -webkit-tap-highlight-color: transparent; }
+.btn:focus-visible, .header-cta:focus-visible, .mobile-menu-button:focus-visible, .gallery-item:focus-visible, .lightbox button:focus-visible, .form-grid input:focus-visible, .form-grid select:focus-visible, .form-grid textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.service-card:focus-within { background: var(--accent); }
+.gallery-item:focus-visible img { transform: scale(1.04); }
+.event-pills a:hover, .event-pills a:focus-visible { color: var(--foreground); }
+.event-pills a:hover span, .event-pills a:focus-visible span { color: var(--primary); }
+.step p, .experience-section .section-title p { color: color-mix(in oklab, var(--color-ink) 82%, transparent); }
+.trust-item p { opacity: .85; }
+.form-grid input[aria-invalid="true"], .form-grid select[aria-invalid="true"] { border-color: var(--destructive); }
+.form-grid small, .form-status.error { color: color-mix(in oklab, var(--destructive) 70%, var(--foreground)); }
+.form-submit:disabled { opacity: .65; cursor: wait; }
+.lightbox { background: color-mix(in oklab, var(--background) 97%, transparent); }
+.lightbox img, .lightbox video { max-height: calc(100svh - 100px); }
+.lightbox button { background: var(--background); color: var(--foreground); z-index: 2; }
+.footer-main { padding-bottom: 45px; }
+.footer-links a:hover, .footer-contact a:hover { color: var(--primary); }
+main > section[id] { scroll-margin-top: 92px; }
+.gallery-item { background: var(--card); }
+.gallery-item img { opacity: 1; }
+@media (max-width: 1180px) {
+  .hero { min-height: 0; }
+  .mobile-nav { max-height: calc(100svh - 92px); overflow-y: auto; }
+}
+@media (max-width: 800px) {
+  main > section[id] { scroll-margin-top: 72px; }
+  .hero { min-height: 0; padding-block: 116px 64px; }
+  .hero-shade { background: linear-gradient(90deg, color-mix(in oklab, var(--background) 95%, transparent), color-mix(in oklab, var(--background) 48%, transparent)), linear-gradient(0deg, var(--background), transparent 38%); }
+  .story-grid, .about-grid, .drinks-grid, .testimonial-layout, .contact-grid, .faq-grid, .instagram-grid { gap: 30px; }
+  .story-image-wrap img { height: min(60vw, 470px); }
+  .steps-grid { margin-top: 42px; }
+  .instagram-images img { height: clamp(125px, 24vw, 210px); }
+  .footer-main { grid-template-columns: 1.4fr 1fr; }
+  .footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .section { padding-block: 62px; }
+  .section-title h2, .cta-inner h2 { font-size: clamp(40px, 11vw, 51px); line-height: 1.02; }
+  .hero { padding-block: 100px 30px; }
+  .hero-shade { background: linear-gradient(0deg, var(--background) 0%, color-mix(in oklab, var(--background) 90%, transparent) 34%, color-mix(in oklab, var(--background) 48%, transparent) 100%), linear-gradient(90deg, color-mix(in oklab, var(--background) 65%, transparent), transparent); }
+  .hero h1 { font-size: clamp(43px, 12vw, 52px); }
+  .hero-sub { font-size: 13px; }
+  .hero-trust span { font-size: 10px; }
+  .story-image-wrap img { height: 350px; }
+  .service-card { min-height: 0; padding: 23px; }
+  .service-icon { margin: 13px 0; }
+  .services-grid { gap: 1px; }
+  .event-pills a { min-width: 0; font-size: 19px; overflow-wrap: anywhere; }
+  .gallery-grid { grid-template-rows: none; grid-auto-rows: clamp(145px, 44vw, 185px); }
+  .gallery-item:last-child { grid-column: auto; }
+  .instagram-grid h2 { font-size: clamp(40px, 11vw, 49px); }
+  .instagram-images { gap: 5px; }
+  .instagram-images img { height: clamp(90px, 29vw, 125px); }
+  .footer-main { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 18px; }
+  .footer-contact a { overflow-wrap: anywhere; }
+  .lightbox { padding: 55px 45px; }
+  .lightbox img, .lightbox video { max-height: calc(100svh - 130px); }
+}
