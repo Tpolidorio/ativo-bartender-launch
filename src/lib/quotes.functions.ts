@@ -9,7 +9,7 @@ export const quoteSchema = z.object({
   data_evento: z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Informe uma data válida.")]).optional(),
   cidade: z.string().trim().min(2, "Informe a cidade do evento.").max(120),
   quantidade_convidados: z.number().int().positive().max(100000).optional(),
-  tipo_servico: z.string().trim().min(1, "Selecione o serviço desejado.").max(100),
+  tipo_servico: z.string({ error: "Selecione o serviço desejado." }).trim().min(1, "Selecione o serviço desejado.").max(100),
   observacoes: z.string().trim().max(2000).optional(),
   website: z.string().max(0).optional(),
 });
