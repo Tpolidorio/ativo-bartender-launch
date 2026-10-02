@@ -107,8 +107,8 @@ function Index() {
         if (!controls?.length) return;
         const first = controls[0];
         const last = controls[controls.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
       }
     };
     window.addEventListener("keydown", onKey);
@@ -130,7 +130,7 @@ function Index() {
       quantidade_convidados: data.get("quantidade_convidados") ? Number(data.get("quantidade_convidados")) : undefined,
       tipo_servico: data.get("tipo_servico"), observacoes: data.get("observacoes"), website: data.get("website"),
     });
-    if (!parsed.success) { setErrors(Object.fromEntries(parsed.error.issues.map(issue => [String(issue.path[0]), issue.message]))); setFormStatus("Confira os campos indicados e tente novamente."); const first = parsed.error.issues[0]?.path[0]; if (first) form.elements.namedItem(String(first))?.dispatchEvent(new Event("invalid")); form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus(); return; }
+    if (!parsed.success) { setErrors(Object.fromEntries(parsed.error.issues.map(issue => [String(issue.path[0]), issue.message]))); setFormStatus("Confira os campos indicados e tente novamente."); const first = parsed.error.issues[0]?.path[0]; if (first) form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus(); return; }
     setErrors({}); setSending(true); setQuoteWa("");
     try { await submitQuote({ data: parsed.data }); const d = parsed.data; const msg = ["Olá! Acabei de solicitar um orçamento de bartender para eventos pelo site da Ativo Bartender.", `Nome: ${d.nome}`, `Evento: ${d.tipo_evento}`, d.data_evento ? `Data: ${d.data_evento.split("-").reverse().join("/")}` : "", `Cidade: ${d.cidade}`, d.quantidade_convidados ? `Convidados: ${d.quantidade_convidados}` : "", `Serviço: ${d.tipo_servico}`].filter(Boolean).join("\n"); if (whatsappNumberDigits) setQuoteWa(`https://wa.me/${whatsappNumberDigits}?text=${encodeURIComponent(msg)}`); setFormStatus("Pedido enviado com sucesso! Entraremos em contato em breve."); form.reset(); }
     catch { setFormStatus("Não foi possível enviar seu pedido agora. Tente novamente."); }
