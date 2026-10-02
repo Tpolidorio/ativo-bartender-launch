@@ -86,7 +86,7 @@ function Index() {
   const lightboxTrigger = useRef<HTMLElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(".section-title, .story-image-wrap, .benefit-list > div, .service-card, .event-pills a, .step, .drinks-image, .gallery-item, .about-image, .about-words span, .testimonial-panel, .quote-form, .faq-list details, .instagram-images img");
+    const els = document.querySelectorAll<HTMLElement>(".section-title, .story-image-wrap, .benefit-list > div, .service-card, .event-pills a, .step, .drinks-image, .about-image, .about-words span, .testimonial-panel, .quote-form, .faq-list details");
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("is-visible"); io.unobserve(en.target); } }), { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
     els.forEach((el) => { const sib = el.parentElement ? Array.from(el.parentElement.children).indexOf(el) : 0; el.style.setProperty("--reveal-delay", `${Math.min(sib, 6) * 70}ms`); if (el.getBoundingClientRect().top < window.innerHeight) return; el.classList.add("reveal"); io.observe(el); });
@@ -128,7 +128,7 @@ function Index() {
       nome: data.get("nome"), telefone: data.get("telefone"), email: data.get("email"), tipo_evento: data.get("tipo_evento"),
       data_evento: String(data.get("data_evento") || ""), cidade: data.get("cidade"),
       quantidade_convidados: data.get("quantidade_convidados") ? Number(data.get("quantidade_convidados")) : undefined,
-      tipo_servico: data.get("tipo_servico"), observacoes: data.get("observacoes"), website: data.get("website"),
+      tipo_servico: data.get("tipo_servico") ?? "", observacoes: data.get("observacoes"), website: data.get("website"),
     });
     if (!parsed.success) { setErrors(Object.fromEntries(parsed.error.issues.map(issue => [String(issue.path[0]), issue.message]))); setFormStatus("Confira os campos indicados e tente novamente."); const first = parsed.error.issues[0]?.path[0]; if (first) form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus(); return; }
     setErrors({}); setSending(true); setQuoteWa("");
