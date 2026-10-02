@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, ChevronDown, GlassWater, Instagram, Mail, MapPin, Menu, MessageCircle, Play, ShieldCheck, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { quoteSchema, submitQuote } from "@/lib/quotes.functions";
-import { siteConfig, whatsappUrl } from "@/lib/site-config";
+import { siteConfig, whatsappUrl, whatsappNumberDigits } from "@/lib/site-config";
 import teamAsset from "@/assets/real/SaveClip.App_654167718_18057153935456916_4949382193211138204_n.jpg.asset.json";
 import barAsset from "@/assets/real/SaveClip.App_653891368_18415837459120059_940093852938342312_n.jpg.asset.json";
 import fruitAsset from "@/assets/real/SaveClip.App_549767287_18386768356120059_964754281852323932_n.jpg.asset.json";
@@ -30,7 +30,6 @@ export const Route = createFileRoute("/")({
     { property: "og:title", content: "Ativo Bartender | Bartender e Bar para Eventos" },
     { property: "og:description", content: description },
     { property: "og:type", content: "website" },
-    { property: "og:url", content: "/" },
     { name: "twitter:card", content: "summary_large_image" },
   ], links: [{ rel: "canonical", href: "/" }] }),
   component: Index,
@@ -83,6 +82,9 @@ function Index() {
   const [formStatus, setFormStatus] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [quoteWa, setQuoteWa] = useState("");
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const lightboxTrigger = useRef<HTMLElement | null>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>(".section-title, .story-image-wrap, .benefit-list > div, .service-card, .event-pills a, .step, .drinks-image, .gallery-item, .about-image, .about-words span, .testimonial-panel, .quote-form, .faq-list details, .instagram-images img");
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
@@ -91,7 +93,33 @@ function Index() {
     return () => io.disconnect();
   }, []);
   useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 30); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll); }, []);
-  useEffect(() => { if (lightbox === null) return; const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightbox(null); if (e.key === "ArrowRight") setLightbox((v) => v === null ? 0 : (v + 1) % gallery.length); if (e.key === "ArrowLeft") setLightbox((v) => v === null ? 0 : (v + gallery.length - 1) % gallery.length); }; window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey); }, [lightbox]);
+  useEffect(() => {
+    if (lightbox === null) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    lightboxRef.current?.querySelector<HTMLButtonElement>(".lightbox-close")?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+      if (e.key === "ArrowRight") setLightbox((v) => v === null ? 0 : (v + 1) % gallery.length);
+      if (e.key === "ArrowLeft") setLightbox((v) => v === null ? 0 : (v + gallery.length - 1) % gallery.length);
+      if (e.key === "Tab") {
+        const controls = lightboxRef.current?.querySelectorAll<HTMLElement>('button, video[controls]');
+        if (!controls?.length) return;
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = previousOverflow; lightboxTrigger.current?.focus(); };
+  }, [lightbox !== null]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMenuOpen(false); menuButtonRef.current?.focus(); } };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); setFormStatus("");
     const form = e.currentTarget;
@@ -102,14 +130,14 @@ function Index() {
       quantidade_convidados: data.get("quantidade_convidados") ? Number(data.get("quantidade_convidados")) : undefined,
       tipo_servico: data.get("tipo_servico"), observacoes: data.get("observacoes"), website: data.get("website"),
     });
-    if (!parsed.success) { setErrors(Object.fromEntries(parsed.error.issues.map(issue => [String(issue.path[0]), issue.message]))); setFormStatus("Confira os campos indicados e tente novamente."); return; }
+    if (!parsed.success) { setErrors(Object.fromEntries(parsed.error.issues.map(issue => [String(issue.path[0]), issue.message]))); setFormStatus("Confira os campos indicados e tente novamente."); const first = parsed.error.issues[0]?.path[0]; if (first) form.elements.namedItem(String(first))?.dispatchEvent(new Event("invalid")); form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus(); return; }
     setErrors({}); setSending(true); setQuoteWa("");
-    try { await submitQuote({ data: parsed.data }); const d = parsed.data; const msg = ["Olá! Acabei de solicitar um orçamento de bartender para eventos pelo site da Ativo Bartender.", `Nome: ${d.nome}`, `Evento: ${d.tipo_evento}`, d.data_evento ? `Data: ${d.data_evento.split("-").reverse().join("/")}` : "", `Cidade: ${d.cidade}`, d.quantidade_convidados ? `Convidados: ${d.quantidade_convidados}` : "", `Serviço: ${d.tipo_servico}`].filter(Boolean).join("\n"); if (siteConfig.whatsappNumber) setQuoteWa(`https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(msg)}`); setFormStatus("Pedido enviado com sucesso! Entraremos em contato em breve."); form.reset(); }
+    try { await submitQuote({ data: parsed.data }); const d = parsed.data; const msg = ["Olá! Acabei de solicitar um orçamento de bartender para eventos pelo site da Ativo Bartender.", `Nome: ${d.nome}`, `Evento: ${d.tipo_evento}`, d.data_evento ? `Data: ${d.data_evento.split("-").reverse().join("/")}` : "", `Cidade: ${d.cidade}`, d.quantidade_convidados ? `Convidados: ${d.quantidade_convidados}` : "", `Serviço: ${d.tipo_servico}`].filter(Boolean).join("\n"); if (whatsappNumberDigits) setQuoteWa(`https://wa.me/${whatsappNumberDigits}?text=${encodeURIComponent(msg)}`); setFormStatus("Pedido enviado com sucesso! Entraremos em contato em breve."); form.reset(); }
     catch { setFormStatus("Não foi possível enviar seu pedido agora. Tente novamente."); }
     finally { setSending(false); }
   }
   return <div className="site-shell">
-    <header className={`site-header ${scrolled || menuOpen ? "is-scrolled" : ""}`}><div className="header-inner"><Brand /><nav className="desktop-nav" aria-label="Menu principal">{nav.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</nav><a href="#contato" className="header-cta">Solicitar orçamento <ArrowUpRight size={15} /></a><Button variant="ghost" size="icon" className="mobile-menu-button" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button></div>{menuOpen && <nav className="mobile-nav" aria-label="Menu móvel">{nav.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)}>{label}<ArrowUpRight size={15} /></a>)}<a href="#contato" onClick={() => setMenuOpen(false)}>Solicitar orçamento <ArrowUpRight size={15} /></a></nav>}</header>
+    <header className={`site-header ${scrolled || menuOpen ? "is-scrolled" : ""}`}><div className="header-inner"><Brand /><nav className="desktop-nav" aria-label="Menu principal">{nav.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</nav><a href="#contato" className="header-cta">Solicitar orçamento <ArrowUpRight size={15} /></a><Button ref={menuButtonRef} variant="ghost" size="icon" className="mobile-menu-button" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button></div>{menuOpen && <nav id="mobile-navigation" className="mobile-nav" aria-label="Menu móvel">{nav.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)}>{label}<ArrowUpRight size={15} /></a>)}<a href="#contato" onClick={() => setMenuOpen(false)}>Solicitar orçamento <ArrowUpRight size={15} /></a></nav>}</header>
 
     <main>
       <section id="inicio" className="hero"><img src={team} width={1440} height={1080} alt="Equipe da Ativo Bartender atrás do bar em um evento real" className="hero-image" /><div className="hero-shade" /><div className="container hero-content"><div className="hero-copy"><div className="hero-kicker"><span className="kicker-line" /> O BAR QUE TRANSFORMA O SEU EVENTO</div><h1>Transformamos seu evento em uma experiência <em>inesquecível.</em></h1><p className="hero-lead">Drinks incríveis, atendimento profissional e uma experiência de bar que seus convidados vão lembrar.</p><p className="hero-sub">A Ativo Bartender leva até seu evento uma experiência completa de bar, combinando cocktails, apresentação, atendimento e qualidade para tornar cada celebração ainda mais especial.</p><div className="hero-actions"><WhatsAppLink icon className="btn btn-primary">{siteConfig.whatsappNumber ? "Solicitar orçamento pelo WhatsApp" : "Solicitar orçamento"}<ArrowUpRight size={17} /></WhatsAppLink><a className="btn btn-outline" href="#servicos">Conhecer nossos serviços <ArrowRight size={17} /></a></div><div className="hero-trust"><span><Check /> Atendimento personalizado</span><span><Check /> Bartenders profissionais</span><span><Check /> Drinks preparados na hora</span><span><Check /> Para diferentes eventos</span></div></div></div><a className="scroll-hint" href="#diferenciais"><span>ROLE PARA CONHECER</span><ArrowDown size={16} /></a><div className="hero-side-note">ATIVO BARTENDER <span>—</span> EXPERIÊNCIAS QUE BRINDAM A VIDA</div></section>
@@ -126,7 +154,7 @@ function Index() {
 
       <section className="section drinks-section"><div className="container drinks-grid"><div className="drinks-copy"><SectionTitle eyebrow="SABOR EM CADA DETALHE" title="Drinks que chamam atenção antes mesmo do primeiro gole" text="Apresentação, sabor e criatividade trabalhando juntos." /><div className="drink-tags">{["Gin Tônica", "Mojito", "Caipirinha", "Aperol Spritz", "Moscow Mule", "Drinks autorais"].map(x => <span key={x}>{x}</span>)}</div><p className="drinks-note">O cardápio pode ser personalizado de acordo com o perfil e estilo de cada evento.</p><a href="#contato" className="text-link">Quero montar meu cardápio <ArrowUpRight size={18} /></a></div><div className="drinks-image"><img src={fruit} width={1440} height={1440} loading="lazy" alt="Frutas frescas e ingredientes para os drinks da Ativo Bartender" /><span>UMA EXPERIÊNCIA PARA TODOS OS SENTIDOS</span></div></div></section>
 
-      <section id="galeria" className="section gallery-section"><div className="container"><div className="section-heading-row"><SectionTitle eyebrow="MOMENTOS ATIVO" title="O melhor da festa acontece entre um brinde e outro." text="Uma pequena amostra do universo que inspira cada experiência." /><a href="#contato" className="text-link gallery-contact">Levar essa experiência para meu evento <ArrowUpRight size={18} /></a></div><div className="gallery-grid">{gallery.map((item, i) => <Button variant="ghost" className={`gallery-item ${item.className}`} key={item.alt} onClick={() => setLightbox(i)} aria-label={`${item.video ? "Reproduzir" : "Ampliar"}: ${item.alt}`}><img src={item.src} alt={item.alt} loading="lazy" /><span>{item.video ? <Play size={20} fill="currentColor" /> : <ArrowUpRight size={20} />}</span></Button>)}</div><div className="gallery-footer"><p className="demo-note">Registros reais de eventos da Ativo Bartender.</p><WhatsAppLink icon className="btn btn-primary">Levar essa experiência para meu evento <ArrowUpRight size={17} /></WhatsAppLink></div></div></section>
+      <section id="galeria" className="section gallery-section"><div className="container"><div className="section-heading-row"><SectionTitle eyebrow="MOMENTOS ATIVO" title="O melhor da festa acontece entre um brinde e outro." text="Uma pequena amostra do universo que inspira cada experiência." /><a href="#contato" className="text-link gallery-contact">Levar essa experiência para meu evento <ArrowUpRight size={18} /></a></div><div className="gallery-grid">{gallery.map((item, i) => <Button variant="ghost" className={`gallery-item ${item.className}`} key={item.alt} onClick={(event) => { lightboxTrigger.current = event.currentTarget; setLightbox(i); }} aria-label={`${item.video ? "Reproduzir" : "Ampliar"}: ${item.alt}`}><img src={item.src} alt={item.alt} loading="lazy" /><span>{item.video ? <Play size={20} fill="currentColor" /> : <ArrowUpRight size={20} />}</span></Button>)}</div><div className="gallery-footer"><p className="demo-note">Registros reais de eventos da Ativo Bartender.</p><WhatsAppLink icon className="btn btn-primary">Levar essa experiência para meu evento <ArrowUpRight size={17} /></WhatsAppLink></div></div></section>
 
       <section id="sobre" className="section about-section"><div className="container about-grid"><div className="about-image"><img src={team} width={1440} height={1080} loading="lazy" alt="Equipe da Ativo Bartender em frente ao bar montado para evento" /></div><div className="about-copy"><SectionTitle eyebrow="QUEM SOMOS" title="Muito prazer, somos a Ativo Bartender" /><p>A Ativo Bartender nasceu com o propósito de levar mais experiência, sabor e personalidade para eventos especiais.</p><p>Nosso trabalho vai além de preparar drinks. Buscamos criar um ambiente descontraído, elegante e marcante, oferecendo aos anfitriões tranquilidade e aos convidados uma experiência que complementa cada celebração.</p><div className="about-words"><span>Atendimento personalizado</span><span>Profissionalismo</span><span>Qualidade</span><span>Experiência</span></div></div></div></section>
 
@@ -142,6 +170,6 @@ function Index() {
     </main>
     <footer className="footer"><div className="container"><div className="footer-main"><div className="footer-brand"><Brand /><p>Experiência de bar para eventos inesquecíveis.</p><WhatsAppLink icon className="btn btn-primary footer-cta">Falar pelo WhatsApp <ArrowUpRight size={17} /></WhatsAppLink></div><div className="footer-links"><strong>EXPLORE</strong>{[["Início", "inicio"], ["Serviços", "servicos"], ["Galeria", "galeria"], ["Sobre", "sobre"], ["FAQ", "faq"], ["Contato", "contato"]].map(([label, id]) => <a href={`#${id}`} key={id}>{label}</a>)}</div><div className="footer-contact"><strong>CONTATO</strong>{siteConfig.whatsappNumber && <WhatsAppLink><MessageCircle size={16} /> WhatsApp</WhatsAppLink>}{siteConfig.instagramUrl && <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer"><Instagram size={16} /> Instagram</a>}{siteConfig.threadsUrl && <a href={siteConfig.threadsUrl} target="_blank" rel="noopener noreferrer">Threads <ArrowUpRight size={16} /></a>}{siteConfig.email && <a href={`mailto:${siteConfig.email}`}><Mail size={16} /> {siteConfig.email}</a>}{siteConfig.serviceArea && <span><MapPin size={16} /> {siteConfig.serviceArea}</span>}<a href="#contato">Solicitar orçamento <ArrowUpRight size={16} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Ativo Bartender. Todos os direitos reservados.</span><span>FEITO PARA CELEBRAR</span></div></div></footer>
     {siteConfig.whatsappNumber && <><WhatsAppLink className="floating-whatsapp" icon><span className="sr-only">Pedir orçamento pelo WhatsApp</span></WhatsAppLink><div className="mobile-bottom"><WhatsAppLink icon className="btn btn-primary">Pedir orçamento pelo WhatsApp <ArrowUpRight size={17} /></WhatsAppLink></div></>}
-    {lightbox !== null && gallery[lightbox] && <div className="lightbox" role="dialog" aria-modal="true" aria-label="Foto ampliada" onClick={() => setLightbox(null)}><Button variant="ghost" size="icon" className="lightbox-close" aria-label="Fechar foto" onClick={() => setLightbox(null)}><X /></Button><Button variant="ghost" size="icon" className="lightbox-prev" aria-label="Foto anterior" onClick={e => { e.stopPropagation(); setLightbox((lightbox + gallery.length - 1) % gallery.length); }}><ChevronLeft /></Button>{gallery[lightbox].video ? <video key={gallery[lightbox].video} src={gallery[lightbox].video} poster={gallery[lightbox].src} controls autoPlay playsInline aria-label={gallery[lightbox].alt} onClick={e => e.stopPropagation()} /> : <img src={gallery[lightbox].src} alt={gallery[lightbox].alt} onClick={e => e.stopPropagation()} />}<Button variant="ghost" size="icon" className="lightbox-next" aria-label="Próxima foto" onClick={e => { e.stopPropagation(); setLightbox((lightbox + 1) % gallery.length); }}><ChevronRight /></Button></div>}
+    {lightbox !== null && gallery[lightbox] && <div ref={lightboxRef} className="lightbox" role="dialog" aria-modal="true" aria-label={gallery[lightbox].video ? "Vídeo do evento" : "Foto ampliada"} onClick={() => setLightbox(null)}><Button variant="ghost" size="icon" className="lightbox-close" aria-label="Fechar foto ou vídeo" onClick={() => setLightbox(null)}><X /></Button><Button variant="ghost" size="icon" className="lightbox-prev" aria-label="Foto anterior" onClick={e => { e.stopPropagation(); setLightbox((lightbox + gallery.length - 1) % gallery.length); }}><ChevronLeft /></Button>{gallery[lightbox].video ? <video key={gallery[lightbox].video} src={gallery[lightbox].video} poster={gallery[lightbox].src} controls autoPlay playsInline tabIndex={0} aria-label={gallery[lightbox].alt} onClick={e => e.stopPropagation()} /> : <img src={gallery[lightbox].src} alt={gallery[lightbox].alt} onClick={e => e.stopPropagation()} />}<Button variant="ghost" size="icon" className="lightbox-next" aria-label="Próxima foto" onClick={e => { e.stopPropagation(); setLightbox((lightbox + 1) % gallery.length); }}><ChevronRight /></Button></div>}
   </div>;
 }
